@@ -1,0 +1,67 @@
+step(0..5).
+maxMosse(5).
+
+%configurazione iniziale...
+target(X,Y):- cell(X,Y,4).
+playerPosition(0,1,1).
+boxPosition(0,Id,X,Y):-box(Id,X,Y).
+
+%le celle dove posso teoricamente spostarmi.
+validLocation(X,Y):- cell(X,Y,0).
+validLocation(X,Y):- cell(X,Y,3).
+validLocation(X,Y):- cell(X,Y,4).
+
+%genero le adiacenze rispetto alle posizioni valide.
+adj(X,Y,X,Y+1):-validLocation(X,Y),validLocation(X,Y+1).
+adj(X,Y,X,Y-1):-validLocation(X,Y),validLocation(X,Y-1).
+adj(X,Y,X+1,Y):-validLocation(X,Y),validLocation(X+1,Y).
+adj(X,Y,X-1,Y):-validLocation(X,Y),validLocation(X-1,Y).
+
+%decido se spostare un box o meno in una certa direzione se ci sono ancora mosse disponibili.
+move(S,Id,up) | not_move(S,Id,up) :- boxPosition(S,Id,_,_),maxMosse(M),S<M.
+move(S,Id,down) | not_move(S,Id,down) :- boxPosition(S,Id,_,_),maxMosse(M),S<M.
+move(S,Id,right) | not_move(S,Id,right) :- boxPosition(S,Id,_,_),maxMosse(M),S<M.
+move(S,Id,left) | not_move(S,Id,left) :- boxPosition(S,Id,_,_),maxMosse(M),S<M.
+
+%non posso spostare piu' di un box nello stesso step.
+:- move(S,Id1,_),move(S,Id2,_),Id1!=Id2.
+%non posso spostare un box in due direzioni diverse nello stesso istante
+:- move(S,Id,D1),move(S,Id,D2),D1!=D2.
+
+%in base alla direzione scelta cambio la posizione del player,considerando che dove prima c'era il box 
+%ora c'e' il player e che abbia spostato effettivamente qualcosa.
+playerPosition(S+1,X-1,Y):- move(S,_,up),playerPosition(S,X,Y).
+playerPosition(S+1,X+1,Y):- move(S,_,down),playerPosition(S,X,Y).
+playerPosition(S+1,X,Y+1):- move(S,_,right),playerPosition(S,X,Y).
+playerPosition(S+1,X,Y-1):- move(S,_,left),playerPosition(S,X,Y).
+somethingMoved(S) :- move(S,_,_).
+
+%le posizioni occupate da un box.
+occupied(S,X,Y) :- boxPosition(S,_,X,Y).
+
+%tutti i vari spostamenti di un box che posso fare in ogni istante.
+boxPosition(S+1,Id,X-1,Y):- move(S,Id,up),boxPosition(S,Id,X,Y),validLocation(X-1,Y),not occupied(S,X-1,Y).
+boxPosition(S+1,Id,X+1,Y):- move(S,Id,down),boxPosition(S,Id,X,Y),validLocation(X+1,Y),not occupied(S,X+1,Y).
+boxPosition(S+1,Id,X,Y+1):- move(S,Id,right),boxPosition(S,Id,X,Y),validLocation(X,Y+1),not occupied(S,X,Y+1).
+boxPosition(S+1,Id,X,Y-1):- move(S,Id,left),boxPosition(S,Id,X,Y),validLocation(X,Y-1),not occupied(S,X,Y-1).
+
+%il player deve poter raggiungere la casella adiacente al box per poterlo spostare.
+:- boxPosition(S,Id,X,Y),playerPosition(S,X1,Y1),move(S,Id,up), not reachable(S,X1,Y1,X+1,Y),X1!=X,Y1!=Y.
+:- boxPosition(S,Id,X,Y),playerPosition(S,X1,Y1),move(S,Id,down), not reachable(S,X1,Y1,X-1,Y),X1!=X,Y1!=Y.
+:- boxPosition(S,Id,X,Y),playerPosition(S,X1,Y1),move(S,Id,right), not reachable(S,X1,Y1,X,Y-1),X1!=X,Y1!=Y.
+:- boxPosition(S,Id,X,Y),playerPosition(S,X1,Y1),move(S,Id,left), not reachable(S,X1,Y1,X,Y+1),X1!=X,Y1!=Y.
+
+%non posso avere un answer set in cui la posizione del box non coincida almeno una volta ad un target
+%:-boxPosition(S,_,X,Y),move(S,Id,up),not target(X-1,Y).
+
+%caso in cui ad uno step un box non venga mosso
+boxPosition(S+1,Id,X,Y) :- boxPosition(S,Id,X,Y), not_move(S,Id,_),maxMosse(M),S<M.
+playerPosition(S+1,X,Y) :- not somethingMoved(S),maxMosse(M),playerPosition(S,X,Y),S<M.
+
+%identifica la raggiungibilita' punto-punto ad un certo step.
+reachable(S,X1,Y1,X2,Y2) :- adj(X1,Y1,X2,Y2),not occupied(S,X2,Y2),step(S).
+reachable(S,X1,Y1,X2,Y2) :- reachable(S,X1,Y1,X3,Y3),reachable(S,X3,Y3,X2,Y2).
+
+%deadPoint(X,Y):-
+
+
