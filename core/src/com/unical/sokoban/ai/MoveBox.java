@@ -3,7 +3,7 @@ package com.unical.sokoban.ai;
 import it.unical.mat.embasp.languages.Id;
 import it.unical.mat.embasp.languages.Param;
 
-@Id("boxPosition")
+@Id("move")
 public class MoveBox {
 
 	@Param(0)
@@ -11,18 +11,15 @@ public class MoveBox {
 	@Param(1)
 	private int boxId;
 	@Param(2)
-	private int x;
-	@Param(3)
-	private int y;
+	private String direction;
 
 	public MoveBox() {
 	}
 	
-	public MoveBox(int step, int boxId, int x, int y) {
+	public MoveBox(int step, int boxId, String dir) {
 		this.step = step;
 		this.boxId = boxId;
-		this.x = x;
-		this.y = y;
+		this.direction = dir;
 	}
 
 	public int getStep() {
@@ -41,26 +38,18 @@ public class MoveBox {
 		this.boxId = boxId;
 	}
 
-	public int getX() {
-		return x;
+	public String getDirection() {
+		return this.direction;
 	}
 
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public void setY(int y) {
-		this.y = y;
+	public void setDirection(String dir) {
+		this.direction = dir;
 	}
 
 	@Override
 	public String toString() {
 		String print;
-		print = "boxPosition(" + this.step + "," + this.boxId + "," + this.x + "," + this.y + ")";
+		print = "move(" + this.step + "," + this.boxId + "," + this.direction+ ")";
 		return print;
 	}
 }

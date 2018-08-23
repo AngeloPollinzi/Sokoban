@@ -1,8 +1,13 @@
 package com.unical.sokoban.ai;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 import com.unical.sokoban.logic.World;
 import it.unical.mat.embasp.base.Handler;
 import it.unical.mat.embasp.base.InputProgram;
+import it.unical.mat.embasp.base.OptionDescriptor;
 import it.unical.mat.embasp.base.Output;
 import it.unical.mat.embasp.languages.IllegalAnnotationException;
 import it.unical.mat.embasp.languages.ObjectNotValidException;
@@ -11,13 +16,14 @@ import it.unical.mat.embasp.languages.asp.ASPMapper;
 import it.unical.mat.embasp.languages.asp.AnswerSet;
 import it.unical.mat.embasp.languages.asp.AnswerSets;
 import it.unical.mat.embasp.platforms.desktop.DesktopHandler;
+import it.unical.mat.embasp.specializations.dlv2.DLV2AnswerSets;
 import it.unical.mat.embasp.specializations.dlv2.desktop.DLV2DesktopService;
 
 public class Solver {
 
 	private World world;
 	private int[][] sokobanMatrix;
-	private static String encodingResource = "encodings/sokoban";
+	private static String encodingResource = "encodings/sokoban.txt";
 	private static Handler handler;
 
 	public Solver(World world) {
@@ -28,17 +34,18 @@ public class Solver {
 	public void solve() {
 
 		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2"));
+//		handler.addOption(new OptionDescriptor("-n=0"));
 		InputProgram facts = new ASPInputProgram();
 
-			try {
-				ASPMapper.getInstance().registerClass(MoveBox.class);
-			} catch (ObjectNotValidException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IllegalAnnotationException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+		try {
+			ASPMapper.getInstance().registerClass(MoveBox.class);
+		} catch (ObjectNotValidException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IllegalAnnotationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		for (int i = 0; i < world.boxes.size(); i++) {
 			try {
@@ -56,7 +63,7 @@ public class Solver {
 			for (int j = 0; j < world.getCols(); j++) {
 
 				try {
-					facts.addObjectInput(new Cell(i,j,sokobanMatrix[i][j]));
+					facts.addObjectInput(new Cell(i, j, sokobanMatrix[i][j]));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -66,28 +73,47 @@ public class Solver {
 		}
 		handler.addProgram(facts);
 		InputProgram encoding = new ASPInputProgram();
-		encoding.addFilesPath(encodingResource);
+		encoding.addProgram(getEncodings(encodingResource));
 		handler.addProgram(encoding);
+
 		Output o = handler.startSync();
 
-		AnswerSets answers = (AnswerSets) o;
-		
-		if (answers.getAnswersets().size() == 0) {
+		DLV2AnswerSets answers = (DLV2AnswerSets) o;
+
+		if (answers.getAnswersets().size() <= 0) {
 			System.out.println("NO ANSWER SETS");
-		}
-		
+		} else
 		for (AnswerSet a : answers.getAnswersets()) {
 			try {
 				for (Object obj : a.getAtoms()) {
 					if (obj instanceof MoveBox) {
 						MoveBox movement = (MoveBox) obj;
 						System.out.println(movement);
-					}
+					} /*
+						 * else if (obj instanceof Cell) { Cell cell = (Cell) obj;
+						 * System.out.println(cell); }
+						 */
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private static String getEncodings(String encodingResource) {
+		BufferedReader reader;
+		StringBuilder builder = new StringBuilder();
+		try {
+			reader = new BufferedReader(new FileReader(encodingResource));
+			String line = "";
+			while ((line = reader.readLine()) != null) {
+				builder.append(line);
+				builder.append("\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return builder.toString();
 	}
 
 }
