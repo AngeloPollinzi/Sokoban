@@ -195,6 +195,7 @@ public class World {
 
 	public void reset(TiledMap map) {
 		// TODO Auto-generated method stub
+		int id=0;
 		boxes.clear();
 		targets.clear();
 		Hud.ends = 0;
@@ -219,6 +220,7 @@ public class World {
 			int X=(int) (rect.x / 64);
 			int Y=(int) (rect.y / 64);
 			Box b = new Box(map, rect);
+			b.setId(id++);
 			boxes.add(b);
 			logicMap[X][Y] = 3;
 		}

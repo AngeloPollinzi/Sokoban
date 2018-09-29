@@ -6,7 +6,7 @@ target(X,Y):- cell(X,Y,4).
 playerposition(0,1,1).
 boxposition(0,Id,X,Y):-box(Id,X,Y).
 
-%le celle dove posso teoricamente spostarmi.
+%le celle dove posso spostarmi.
 validposition(X,Y):- cell(X,Y,0).
 validposition(X,Y):- cell(X,Y,1).
 validposition(X,Y):- cell(X,Y,3).
@@ -34,10 +34,7 @@ move(S,Id,"left")|not_move(S,Id,"left"):-boxposition(S,Id,X,Y),maxmosse(M),goodp
 
 %in base alla direzione scelta cambio la posizione del player,considerando che dove prima c'era il box 
 %ora c'e' il player e che abbia spostato effettivamente qualcosa.
-playerposition(S+1,X,Y):- move(S,Id,"up"),boxposition(S,Id,X,Y).
-playerposition(S+1,X,Y):- move(S,Id,"down"),boxposition(S,Id,X,Y).
-playerposition(S+1,X,Y):- move(S,Id,"right"),boxposition(S,Id,X,Y).
-playerposition(S+1,X,Y):- move(S,Id,"left"),boxposition(S,Id,X,Y).
+playerposition(S+1,X,Y):- move(S,Id,_),boxposition(S,Id,X,Y).
 
 %trovo gli step in cui c'e' qualcosa da spostare.
 somethingtomove(S) :- move(S,_,_).
@@ -65,6 +62,6 @@ reachable(S,X,Y) :- reachable(S,X1,Y1),adj(X1,Y1,X,Y),not occupied(S,X,Y).
 
 %mi trovo tutti i punti diversi da un dead point, ossia quei punti che hanno una posizione valida a destra e sinistra 
 %oppure sopra o sotto.
-goodpushlocation(X,Y) :- validposition(X+1,Y),validposition(X-1,Y),not occupied(X+1,Y),not occupied(X-1,Y).
-goodpushlocation(X,Y) :- validposition(X,Y-1),validposition(X,Y+1),not occupied(X,Y-1),not occupied(X,Y+1).
+goodpushlocation(X,Y) :- validposition(X+1,Y),validposition(X,Y),validposition(X-1,Y),not occupied(X,Y).
+goodpushlocation(X,Y) :- validposition(X,Y-1),validposition(X,Y),validposition(X,Y+1),not occupied(X,Y).
 

@@ -7,7 +7,7 @@ public class Box extends InteractiveTileObject {
 
 	private int x;
 	private int y;
-	
+	private int id=0;
 	public float px;
 	public float py;
 	public boolean moved;
@@ -29,6 +29,14 @@ public class Box extends InteractiveTileObject {
 		// TODO Auto-generated method stub
 		x=(int) (this.getX()/64);
 		y=(int) (this.getY()/64);
+	}
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	

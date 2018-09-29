@@ -1,13 +1,18 @@
 package com.unical.sokoban.screens;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import com.unical.sokoban.scenes.Hud;
 import com.unical.sokoban.Sokoban;
+import com.unical.sokoban.ai.MoveBox;
+import com.unical.sokoban.sprites.Box;
 import com.unical.sokoban.sprites.Player.Action;
 import com.unical.sokoban.sprites.Player.Direction;
 
@@ -18,14 +23,27 @@ public class PlayScreen implements Screen {
 	private Viewport viewport;
 	private Hud hud;
 	private float elapsedTime;
-
+	private ArrayList<MoveBox> movements;
+	private int step = 0;
+	private Texture up;
+	private Texture down;
+	private Texture right;
+	private Texture left;
+	private boolean solver = false;
+	float destinationX = 0, destinationY = 0;
+	
 	public PlayScreen(Sokoban sokoban) {
 		this.sokoban = sokoban;
+		movements = new ArrayList<MoveBox>();
 		cam = sokoban.cam;
 		viewport = sokoban.viewport;
 		cam.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
 		elapsedTime = 0f;
 		hud = new Hud(sokoban);
+		up = new Texture("up.png");
+		down = new Texture("down.png");
+		right = new Texture("right.png");
+		left = new Texture("left.png");
 	}
 
 	@Override
@@ -43,11 +61,11 @@ public class PlayScreen implements Screen {
 			if (elapsedTime >= 2f) {
 				elapsedTime = 0f;
 				Hud.levelNum++;
-				
+
 				if (Hud.levelNum > 5) {
 					sokoban.getSounds().stop(1);
 					sokoban.setScreen(new EndScreen(sokoban));
-				}else {
+				} else {
 					sokoban.nextLevel();
 					sokoban.getWorld().reset(sokoban.map);
 				}
@@ -75,7 +93,9 @@ public class PlayScreen implements Screen {
 			sokoban.player.action = Action.RUNNING;
 			sokoban.player.direction = Direction.LEFT;
 		} else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+			solver = true;
 			sokoban.getSolver().solve();
+			movements = sokoban.getSolver().getMovements();
 		} else
 			sokoban.player.action = Action.STANDING;
 
@@ -121,7 +141,62 @@ public class PlayScreen implements Screen {
 		else if (sokoban.player.action == Action.RUNNING && sokoban.player.direction == Direction.LEFT)
 			sokoban.batch.draw(sokoban.player.playerLeft, sokoban.player.x + 10, sokoban.player.y, 42, 59);
 
+		if (solver) {
+			Box box = findBox(step);
+			String direction = findDirection(step);
+			
+			if (destinationX == box.getX() && destinationY == box.getY()) {
+				step++;
+			}
+
+			if (direction.equals("up")) {
+				sokoban.batch.draw(up, box.getX(), box.getY() + 64, 64, 64);
+				destinationX = box.getX();
+				destinationY = box.getY() + 64;
+			} else if (direction.equals("down")) {
+				sokoban.batch.draw(down, box.getX(), box.getY() - 64, 64, 64);
+				destinationX = box.getX();
+				destinationY = box.getY() - 64;
+			} else if (direction.equals("right")) {
+				sokoban.batch.draw(right, box.getX() + 64, box.getY(), 64, 64);
+				destinationX = box.getX() + 64;
+				destinationY = box.getY();
+			} else if (direction.equals("left")) {
+				sokoban.batch.draw(left, box.getX() - 64, box.getY(), 64, 64);
+				destinationX = box.getX() - 64;
+				destinationY = box.getY();
+			}
+
+
+			// System.out.println(destinationX+" "+destinationY);
+		}
 		sokoban.batch.end();
+	}
+
+	private String findDirection(int step) {
+		// TODO Auto-generated method stub
+		String dir = "";
+		for (int i = 0; i < movements.size(); i++) {
+			if (movements.get(i).getStep() == step)
+				dir = movements.get(i).getDirection();
+		}
+		return dir.substring(1, dir.length() - 1);
+	}
+
+	private Box findBox(int step) {
+		// TODO Auto-generated method stub
+		Box box = null;
+		int id = 0;
+		for (int i = 0; i < movements.size(); i++) {
+			if (movements.get(i).getStep() == step)
+				id = movements.get(i).getBoxId();
+		}
+		for (int i = 0; i < sokoban.getWorld().boxes.size(); i++) {
+			if (sokoban.getWorld().boxes.get(i).getId() == id) {
+				box = sokoban.getWorld().boxes.get(i);
+			}
+		}
+		return box;
 	}
 
 	@Override

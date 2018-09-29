@@ -12,7 +12,8 @@ public class MoveBox {
 	private int boxId;
 	@Param(2)
 	private String direction;
-
+	
+	
 	public MoveBox() {
 	}
 	
@@ -45,7 +46,7 @@ public class MoveBox {
 	public void setDirection(String dir) {
 		this.direction = dir;
 	}
-
+	
 	@Override
 	public String toString() {
 		String print;

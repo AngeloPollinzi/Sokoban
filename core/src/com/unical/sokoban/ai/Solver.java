@@ -3,6 +3,7 @@ package com.unical.sokoban.ai;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.unical.sokoban.logic.World;
 import it.unical.mat.embasp.base.Handler;
@@ -23,18 +24,20 @@ public class Solver {
 
 	private World world;
 	private int[][] sokobanMatrix;
-	private static String encodingResource = "encodings/sokoban.txt";
+	private static String encodingResource = "encodings/sokoban";
 	private static Handler handler;
-
+	private ArrayList<MoveBox> movements;
+	
 	public Solver(World world) {
 		this.world = world;
+		movements=new ArrayList<MoveBox>();
 		sokobanMatrix = world.getLogicMap();
 	}
 
 	public void solve() {
 
 		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2"));
-//		handler.addOption(new OptionDescriptor("-n=0"));
+		handler.addOption(new OptionDescriptor("-n=0 "));
 		InputProgram facts = new ASPInputProgram();
 
 		try {
@@ -88,15 +91,14 @@ public class Solver {
 				for (Object obj : a.getAtoms()) {
 					if (obj instanceof MoveBox) {
 						MoveBox movement = (MoveBox) obj;
-						System.out.println(movement);
-					} /*
-						 * else if (obj instanceof Cell) { Cell cell = (Cell) obj;
-						 * System.out.println(cell); }
-						 */
+						movements.add(movement);
+//						System.out.println(movement);
+					} 
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+//			System.out.println("---------------------------");
 		}
 	}
 
@@ -114,6 +116,10 @@ public class Solver {
 			e.printStackTrace();
 		}
 		return builder.toString();
+	}
+	
+	public ArrayList<MoveBox>getMovements(){
+		return movements;
 	}
 
 }
