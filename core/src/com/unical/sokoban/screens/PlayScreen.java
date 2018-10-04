@@ -25,10 +25,7 @@ public class PlayScreen implements Screen {
 	private float elapsedTime;
 	private ArrayList<MoveBox> movements;
 	private int step = 0;
-	private Texture up;
-	private Texture down;
-	private Texture right;
-	private Texture left;
+	private Texture q;
 	private boolean solver = false;
 	float destinationX = 0, destinationY = 0;
 	
@@ -40,10 +37,7 @@ public class PlayScreen implements Screen {
 		cam.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
 		elapsedTime = 0f;
 		hud = new Hud(sokoban);
-		up = new Texture("up.png");
-		down = new Texture("down.png");
-		right = new Texture("right.png");
-		left = new Texture("left.png");
+		q = new Texture("quadrato.png");
 	}
 
 	@Override
@@ -94,7 +88,12 @@ public class PlayScreen implements Screen {
 			sokoban.player.direction = Direction.LEFT;
 		} else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			solver = true;
-			sokoban.getSolver().solve();
+			try {
+				sokoban.getSolver().solve();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			movements = sokoban.getSolver().getMovements();
 		} else
 			sokoban.player.action = Action.STANDING;
@@ -142,59 +141,42 @@ public class PlayScreen implements Screen {
 			sokoban.batch.draw(sokoban.player.playerLeft, sokoban.player.x + 10, sokoban.player.y, 42, 59);
 
 		if (solver) {
-			Box box = findBox(step);
-			String direction = findDirection(step);
+			MoveBox movement= nextMove(step);
+			Box box=boxToMove(step);
 			
+			sokoban.batch.draw(q, movement.getX()*64, movement.getY()*64, 64, 64);
+			destinationX = movement.getX()*64;
+			destinationY = movement.getY()*64;
+
 			if (destinationX == box.getX() && destinationY == box.getY()) {
 				step++;
 			}
 
-			if (direction.equals("up")) {
-				sokoban.batch.draw(up, box.getX(), box.getY() + 64, 64, 64);
-				destinationX = box.getX();
-				destinationY = box.getY() + 64;
-			} else if (direction.equals("down")) {
-				sokoban.batch.draw(down, box.getX(), box.getY() - 64, 64, 64);
-				destinationX = box.getX();
-				destinationY = box.getY() - 64;
-			} else if (direction.equals("right")) {
-				sokoban.batch.draw(right, box.getX() + 64, box.getY(), 64, 64);
-				destinationX = box.getX() + 64;
-				destinationY = box.getY();
-			} else if (direction.equals("left")) {
-				sokoban.batch.draw(left, box.getX() - 64, box.getY(), 64, 64);
-				destinationX = box.getX() - 64;
-				destinationY = box.getY();
-			}
-
-
-			// System.out.println(destinationX+" "+destinationY);
 		}
 		sokoban.batch.end();
 	}
 
-	private String findDirection(int step) {
+	private MoveBox nextMove(int step) {
 		// TODO Auto-generated method stub
-		String dir = "";
+		MoveBox move= null;
 		for (int i = 0; i < movements.size(); i++) {
 			if (movements.get(i).getStep() == step)
-				dir = movements.get(i).getDirection();
+				move = movements.get(i);
 		}
-		return dir.substring(1, dir.length() - 1);
+		return move;
 	}
-
-	private Box findBox(int step) {
+	
+	private Box boxToMove(int step) {
 		// TODO Auto-generated method stub
 		Box box = null;
-		int id = 0;
+		int id=0;
 		for (int i = 0; i < movements.size(); i++) {
 			if (movements.get(i).getStep() == step)
 				id = movements.get(i).getBoxId();
 		}
 		for (int i = 0; i < sokoban.getWorld().boxes.size(); i++) {
-			if (sokoban.getWorld().boxes.get(i).getId() == id) {
+			if (sokoban.getWorld().boxes.get(i).getId() == id)
 				box = sokoban.getWorld().boxes.get(i);
-			}
 		}
 		return box;
 	}

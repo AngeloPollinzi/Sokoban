@@ -27,14 +27,14 @@ public class Solver {
 	private static String encodingResource = "encodings/sokoban";
 	private static Handler handler;
 	private ArrayList<MoveBox> movements;
-	
+
 	public Solver(World world) {
 		this.world = world;
-		movements=new ArrayList<MoveBox>();
+		movements = new ArrayList<MoveBox>();
 		sokobanMatrix = world.getLogicMap();
 	}
 
-	public void solve() {
+	public void solve() throws Exception {
 
 		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2"));
 		handler.addOption(new OptionDescriptor("-n=0 "));
@@ -64,16 +64,27 @@ public class Solver {
 		for (int i = 0; i < world.getRows(); i++) {
 
 			for (int j = 0; j < world.getCols(); j++) {
-
-				try {
-					facts.addObjectInput(new Cell(i, j, sokobanMatrix[i][j]));
-				} catch (Exception e) {
-					e.printStackTrace();
+				if (sokobanMatrix[i][j] != 2) {
+					if (j + 1 < world.getCols() && sokobanMatrix[i][j + 1] != 2) {
+						facts.addObjectInput(new Adj(i,j,i,j+1));
+					}
+					if (j - 1 >= 0 && sokobanMatrix[i][j - 1] != 2) {
+						facts.addObjectInput(new Adj(i,j,i,j-1));
+					}
+					if (i + 1 < world.getRows() && sokobanMatrix[i + 1][j] != 2) {
+						facts.addObjectInput(new Adj(i,j,i+1,j));
+					}
+					if (i-1>= 0 && sokobanMatrix[i - 1][j] != 2) {
+						facts.addObjectInput(new Adj(i,j,i-1,j));
+					}
+					if(sokobanMatrix[i][j]==1 || sokobanMatrix[i][j]==4) {
+						facts.addObjectInput(new Cell(i,j,sokobanMatrix[i][j]));
+					}
 				}
-
 			}
 
 		}
+
 		handler.addProgram(facts);
 		InputProgram encoding = new ASPInputProgram();
 		encoding.addProgram(getEncodings(encodingResource));
@@ -86,20 +97,18 @@ public class Solver {
 		if (answers.getAnswersets().size() <= 0) {
 			System.out.println("NO ANSWER SETS");
 		} else
-		for (AnswerSet a : answers.getAnswersets()) {
-			try {
-				for (Object obj : a.getAtoms()) {
-					if (obj instanceof MoveBox) {
-						MoveBox movement = (MoveBox) obj;
-						movements.add(movement);
-//						System.out.println(movement);
-					} 
+			for (AnswerSet a : answers.getAnswersets()) {
+				try {
+					for (Object obj : a.getAtoms()) {
+						if (obj instanceof MoveBox) {
+							MoveBox movement = (MoveBox) obj;
+							movements.add(movement);
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
-//			System.out.println("---------------------------");
-		}
 	}
 
 	private static String getEncodings(String encodingResource) {
@@ -117,8 +126,8 @@ public class Solver {
 		}
 		return builder.toString();
 	}
-	
-	public ArrayList<MoveBox>getMovements(){
+
+	public ArrayList<MoveBox> getMovements() {
 		return movements;
 	}
 

@@ -11,16 +11,18 @@ public class MoveBox {
 	@Param(1)
 	private int boxId;
 	@Param(2)
-	private String direction;
-	
+	private int x;
+	@Param(3)
+	private int y;
 	
 	public MoveBox() {
 	}
 	
-	public MoveBox(int step, int boxId, String dir) {
+	public MoveBox(int step, int boxId, int x,int y) {
 		this.step = step;
 		this.boxId = boxId;
-		this.direction = dir;
+		this.x=x;
+		this.y=y;
 	}
 
 	public int getStep() {
@@ -39,18 +41,27 @@ public class MoveBox {
 		this.boxId = boxId;
 	}
 
-	public String getDirection() {
-		return this.direction;
+	
+	public int getX() {
+		return x;
 	}
 
-	public void setDirection(String dir) {
-		this.direction = dir;
+	public void setX(int x) {
+		this.x = x;
 	}
-	
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
 	@Override
 	public String toString() {
 		String print;
-		print = "move(" + this.step + "," + this.boxId + "," + this.direction+ ")";
+		print = "move(" + this.step + "," + this.boxId + "," + this.x+","+ this.y+ ")";
 		return print;
 	}
 }
