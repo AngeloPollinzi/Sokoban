@@ -51,6 +51,10 @@ public class PlayScreen implements Screen {
 		handleInput(delta);
 
 		if (sokoban.getWorld().levelCompleted()) {
+			solver=false;
+			movements.clear();
+			destinationX=0;
+			destinationY=0;
 			elapsedTime += delta;
 			if (elapsedTime >= 2f) {
 				elapsedTime = 0f;

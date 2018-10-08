@@ -49,7 +49,7 @@ public class BoxEmbasp {
 	@Override
 	public String toString() {
 		String print;
-		print = "box(" + this.id+ "," + this.x+ "," + this.y + ")";
+		print = "box(" + this.id+ "," + this.x+ "," + this.y + ").";
 		return print;
 	}
 

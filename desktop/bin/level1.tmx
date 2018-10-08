@@ -10,7 +10,7 @@
  </layer>
  <layer name="graphics" width="14" height="12">
   <data encoding="base64" compression="zlib">
-   eJyTZ2BgkB/FBDE6IEWPPAl6sNlFjn3DBQMA6PQSpw==
+   eJyTZ2BgkB/FeDE2QIo+eRL0UMu+4YIBuvASiA==
   </data>
  </layer>
  <objectgroup name="walls">
@@ -37,7 +37,6 @@
   <object id="22" x="0" y="320" width="64" height="64"/>
   <object id="23" x="64" y="320" width="64" height="64"/>
   <object id="24" x="128" y="320" width="64" height="64"/>
-  <object id="25" x="192" y="320" width="64" height="64"/>
   <object id="26" x="0" y="384" width="64" height="64"/>
   <object id="27" x="0" y="448" width="64" height="64"/>
   <object id="28" x="0" y="512" width="64" height="64"/>

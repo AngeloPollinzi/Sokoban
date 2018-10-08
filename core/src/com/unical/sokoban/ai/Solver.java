@@ -50,35 +50,48 @@ public class Solver {
 			e1.printStackTrace();
 		}
 
+		BoxEmbasp b=null;
 		for (int i = 0; i < world.boxes.size(); i++) {
 			try {
 				int x = (int) (world.boxes.get(i).getX() / 64);
 				int y = (int) (world.boxes.get(i).getY() / 64);
-				facts.addObjectInput(new BoxEmbasp(i, x, y));
+				b=new BoxEmbasp(i, x, y);
+				facts.addObjectInput(b);
+//				System.out.println(b);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
+
+		Adj adj = null;
+		Cell c = null;
 		for (int i = 0; i < world.getRows(); i++) {
 
 			for (int j = 0; j < world.getCols(); j++) {
 				if (sokobanMatrix[i][j] != 2) {
 					if (j + 1 < world.getCols() && sokobanMatrix[i][j + 1] != 2) {
-						facts.addObjectInput(new Adj(i,j,i,j+1));
+						adj = new Adj(i, j, i, j + 1);
 					}
 					if (j - 1 >= 0 && sokobanMatrix[i][j - 1] != 2) {
-						facts.addObjectInput(new Adj(i,j,i,j-1));
+						adj = new Adj(i, j, i, j - 1);
 					}
 					if (i + 1 < world.getRows() && sokobanMatrix[i + 1][j] != 2) {
-						facts.addObjectInput(new Adj(i,j,i+1,j));
+						adj = new Adj(i, j, i + 1, j);
 					}
-					if (i-1>= 0 && sokobanMatrix[i - 1][j] != 2) {
-						facts.addObjectInput(new Adj(i,j,i-1,j));
+					if (i - 1 >= 0 && sokobanMatrix[i - 1][j] != 2) {
+						adj = new Adj(i, j, i - 1, j);
 					}
-					if(sokobanMatrix[i][j]==1 || sokobanMatrix[i][j]==4) {
-						facts.addObjectInput(new Cell(i,j,sokobanMatrix[i][j]));
+					if (sokobanMatrix[i][j] == 1 || sokobanMatrix[i][j] == 4) {
+						c = new Cell(i, j, sokobanMatrix[i][j]);
+					}
+					if(adj!=null) {
+						facts.addObjectInput(adj);
+//						System.out.println(adj);
+					}
+					if(c!=null) {
+						facts.addObjectInput(c);
+//						System.out.println(c);
 					}
 				}
 			}

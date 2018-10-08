@@ -61,7 +61,7 @@ public class Adj {
 	@Override
 	public String toString() {
 		String print;
-		print = "adj(" + this.x1+ "," + this.y1+ "," + this.x2 +","+this.y2 + ")";
+		print = "adj(" + this.x1+ "," + this.y1+ "," + this.x2 +","+this.y2 + ").";
 		return print;
 	}
 
