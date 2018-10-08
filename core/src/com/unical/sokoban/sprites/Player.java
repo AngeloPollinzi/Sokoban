@@ -26,22 +26,16 @@ public class Player {
 	public float py;
 
 	public Player() {
-		reset();
-		playerDown = new Texture("Character4.png");
-		playerUp = new Texture("Character7.png");
-		playerRight = new Texture("Character2.png");
-		playerLeft = new Texture("Character1.png");
-	}
-
-	public void reset() {
-		// TODO Auto-generated method stub
 		action = Action.STANDING;
 		direction = Direction.DOWN;
-
 		x=64;
 		y=64;
 		px=64;
 		py=64;
+		playerDown = new Texture("Character4.png");
+		playerUp = new Texture("Character7.png");
+		playerRight = new Texture("Character2.png");
+		playerLeft = new Texture("Character1.png");
 	}
 	
 }

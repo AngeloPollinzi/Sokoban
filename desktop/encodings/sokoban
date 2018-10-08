@@ -1,6 +1,5 @@
-
-step(0..15).
-maxmosse(15).
+step(0..18).
+maxmosse(18).
 
 %configurazione iniziale.
 target(X,Y):- cell(X,Y,4).
@@ -20,50 +19,52 @@ move(S,Id,X2,Y2)|not_move(S,Id,X2,Y2):-boxposition(S,Id,X1,Y1),adj(X1,Y1,X2,Y2),
 :- move(S,Id,X,Y),move(S,Id,X,Y+1),move(S+1,Id,X,Y-1).
 :- move(S,Id,X,Y),move(S,Id,X+1,Y),move(S+1,Id,X-1,Y).
 
-%se sposto un box da un punto ad un altro questi punti devono essere adiacenti
-:-move(S,Id,X1,Y1),move(S+1,Id,X2,Y2),not adj(X1,Y1,X2,Y2).
-
 %predicato che mi indica se ad un certo step muovo qualcosa
 somethingmoved(S):-move(S,_,_,_),step(S).
 
 %in base alla direzione scelta cambio la posizione del player,considerando che dove prima c'era il box 
 %ora c'e' il player e che abbia spostato effettivamente qualcosa.
-playerposition(S+1,X,Y):- move(S,Id,X,Y),boxposition(S,Id,X,Y).
+playerposition(S+1,X,Y):- move(S,Id,X1,Y1),boxposition(S,Id,X,Y).
 
 %le posizioni occupate da un box.
 occupied(S,X,Y) :- boxposition(S,_,X,Y).
 
 %caso in cui ad uno step un box non venga mosso.
-boxposition(S+1,Id,X,Y) :- boxposition(S,Id,X,Y), not_move(S,Id,_,_),maxmosse(M),S<M.
-playerposition(S+1,X,Y) :- playerposition(S,X,Y),not somethingmoved(S),maxmosse(M),S<M.
+boxposition(S+1,Id,X,Y) :- boxposition(S,Id,X,Y), not_move(S,Id,_,_),maxmosse(M),step(S),S<M.
+playerposition(S+1,X,Y) :- playerposition(S,X,Y),not somethingmoved(S),maxmosse(M),step(S),S<M.
 
 %tutti i vari spostamenti di un box che posso fare in ogni istante.
 boxposition(S+1,Id,X,Y):- move(S,Id,X,Y).
 
 %al termine non puo' esistere un box che non sia su un target. 
-reached(Id) :- maxmosse(M), boxposition(M,Id,X,Y),target(X,Y).
-:-boxposition(_,Id,_,_),not reached(Id).
+reached(Id) :- step(M),maxmosse(M),boxposition(M,Id,X,Y),target(X,Y).
+:-boxposition(S,Id,X,Y),not reached(Id).
 
 %identifica la raggiungibilita' di un punto da parte del player ad ogni step.
-reachable(S,X1,Y1,X2,Y2) :- playerposition(S,X1,Y1),adj(X1,Y1,X2,Y2),not occupied(S,X2,Y2),step(S).
-reachable(S,X1,Y1,X2,Y2) :- reachable(S,X1,Y1,X3,Y3),adj(X3,Y3,X2,Y2),not occupied(S,X2,Y2),step(S).
+reachable(S,X2,Y2) :- playerposition(S,X,Y),adj(X,Y,X2,Y2),not occupied(S,X2,Y2),step(S).
+reachable(S,X2,Y2) :- reachable(S,X1,Y1),adj(X1,Y1,X2,Y2),not occupied(S,X2,Y2),step(S).
 
 %mi trovo tutti i punti diversi da un dead point, ossia quei punti che hanno una posizione valida a destra e sinistra 
 %oppure sopra o sotto.
 notdeadpoint(X,Y) :- adj(X,Y,X+1,Y),adj(X,Y,X-1,Y).
 notdeadpoint(X,Y) :- adj(X,Y,X,Y+1),adj(X,Y,X,Y-1).
 
+%non posso spostare un box in un punto morto che non sia un target
 :-boxposition(S,Id,X,Y),move(S,Id,X,Y+1),not notdeadpoint(X,Y+1),not target(X,Y+1).
 :-boxposition(S,Id,X,Y),move(S,Id,X,Y-1),not notdeadpoint(X,Y-1),not target(X,Y-1).
 :-boxposition(S,Id,X,Y),move(S,Id,X+1,Y),not notdeadpoint(X+1,Y),not target(X+1,Y).
 :-boxposition(S,Id,X,Y),move(S,Id,X-1,Y),not notdeadpoint(X-1,Y),not target(X-1,Y).
 
-:-playerposition(S,X,Y),boxposition(S,Id,X1,Y1),move(S,Id,X1,Y1+1),not reachable(S,X,Y,X1,Y1-1).
-:-playerposition(S,X,Y),boxposition(S,Id,X1,Y1),move(S,Id,X1,Y1-1),not reachable(S,X,Y,X1,Y1+1).
-:-playerposition(S,X,Y),boxposition(S,Id,X1,Y1),move(S,Id,X1+1,Y1),not reachable(S,X,Y,X1-1,Y1).
-:-playerposition(S,X,Y),boxposition(S,Id,X1,Y1),move(S,Id,X1-1,Y1),not reachable(S,X,Y,X1+1,Y1).
+%non posso spostare un box in una certa direzione se la casella dalla quale spingerlo
+%non è raggiungibile e non è occupata
+:-boxposition(S,Id,X,Y),move(S,Id,X,Y+1),not reachable(S,X,Y-1),not occupied(S,X,Y-1).
+:-boxposition(S,Id,X,Y),move(S,Id,X,Y-1),not reachable(S,X,Y+1),not occupied(S,X,Y+1).
+:-boxposition(S,Id,X,Y),move(S,Id,X+1,Y),not reachable(S,X-1,Y),not occupied(S,X-1,Y).
+:-boxposition(S,Id,X,Y),move(S,Id,X-1,Y),not reachable(S,X+1,Y),not occupied(S,X+1,Y).
 
+%non posso spostare un box dove ce n'e' gia' un altro
 :-boxposition(S,Id,X,Y),move(S,Id,X,Y+1),occupied(S,X,Y+1).
 :-boxposition(S,Id,X,Y),move(S,Id,X,Y-1),occupied(S,X,Y-1).
 :-boxposition(S,Id,X,Y),move(S,Id,X+1,Y),occupied(S,X+1,Y).
 :-boxposition(S,Id,X,Y),move(S,Id,X-1,Y),occupied(S,X-1,Y).
+

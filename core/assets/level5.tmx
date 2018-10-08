@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.3" orientation="orthogonal" renderorder="right-down" width="14" height="12" tilewidth="64" tileheight="64" infinite="0" nextobjectid="57">
+<map version="1.0" tiledversion="1.1.3" orientation="orthogonal" renderorder="right-down" width="14" height="12" tilewidth="64" tileheight="64" infinite="0" nextobjectid="66">
  <tileset firstgid="1" name="sprites" tilewidth="64" tileheight="64" tilecount="36" columns="6">
   <image source="sprites.png" width="421" height="421"/>
  </tileset>
@@ -13,7 +13,7 @@
  </layer>
  <layer name="graphics" width="14" height="12">
   <data encoding="base64" compression="zlib">
-   eJwTZmBgECYTowNhNDa6Glz6cJmBTZ8wFjF8ZtHKnYTsQ6fRxXC5gZB70fVgczshc6nlP2xmEnIrqRgAMi0Fkg==
+   eJwTZmBgECYTowNy9aGbgctcBjSaGLNwmYdLDbHuJGQfOo0uhssNhNxLyJ3EmEup/7DZjc89lGAAM6AGKg==
   </data>
  </layer>
  <objectgroup name="walls">
@@ -36,7 +36,6 @@
   <object id="22" x="512" y="640" width="64" height="64"/>
   <object id="23" x="384" y="640" width="64" height="64"/>
   <object id="24" x="192" y="640" width="64" height="64"/>
-  <object id="25" x="128" y="640" width="64" height="64"/>
   <object id="27" x="256" y="512" width="64" height="64"/>
   <object id="29" x="448" y="512" width="64" height="64"/>
   <object id="30" x="512" y="512" width="64" height="64"/>
@@ -48,18 +47,27 @@
   <object id="36" x="320" y="256" width="64" height="64"/>
   <object id="55" x="512" y="64" width="64" height="64"/>
   <object id="56" x="448" y="640" width="64" height="64"/>
+  <object id="57" x="768" y="640" width="64" height="64"/>
+  <object id="58" x="768" y="256" width="64" height="64"/>
+  <object id="59" x="128" y="640" width="64" height="64"/>
+  <object id="60" x="64" y="640" width="64" height="64"/>
+  <object id="61" x="448" y="64" width="64" height="64"/>
+  <object id="62" x="384" y="64" width="64" height="64"/>
+  <object id="63" x="640" y="64" width="64" height="64"/>
+  <object id="64" x="768" y="64" width="64" height="64"/>
+  <object id="65" x="704" y="64" width="64" height="64"/>
  </objectgroup>
  <objectgroup name="blocks">
-  <object id="38" x="128" y="320" width="64" height="64"/>
-  <object id="39" x="192" y="576" width="64" height="64"/>
-  <object id="40" x="256" y="128" width="64" height="64"/>
+  <object id="38" x="128" y="256" width="64" height="64"/>
+  <object id="39" x="192" y="512" width="64" height="64"/>
+  <object id="40" x="192" y="128" width="64" height="64"/>
   <object id="42" x="320" y="512" width="64" height="64"/>
   <object id="43" x="256" y="320" width="64" height="64"/>
  </objectgroup>
  <objectgroup name="targets">
-  <object id="46" x="640" y="96" width="32" height="32"/>
-  <object id="48" x="704" y="96" width="32" height="32"/>
-  <object id="49" x="768" y="96" width="32" height="32"/>
+  <object id="46" x="640" y="160" width="32" height="32"/>
+  <object id="48" x="576" y="160" width="32" height="32"/>
+  <object id="49" x="768" y="224" width="32" height="32"/>
   <object id="50" x="768" y="160" width="32" height="32"/>
   <object id="51" x="704" y="160" width="32" height="32"/>
  </objectgroup>

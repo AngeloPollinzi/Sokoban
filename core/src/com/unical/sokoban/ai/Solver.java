@@ -60,7 +60,7 @@ public class Solver {
 				e.printStackTrace();
 			}
 		}
-
+		
 		for (int i = 0; i < world.getRows(); i++) {
 
 			for (int j = 0; j < world.getCols(); j++) {

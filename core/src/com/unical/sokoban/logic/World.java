@@ -231,8 +231,23 @@ public class World {
 			logicMap[(int) (rect.x / 64)][(int) (rect.y / 64)] = 4;
 			Hud.ends++;
 		}
-		player.reset();
+		resetPlayer();
 		logicMap[(int) (player.x / 64)][(int) (player.y / 64)] = 1;
+	}
+
+	private void resetPlayer() {
+		// TODO Auto-generated method stub
+		for (int i = 0; i < getRows(); i++) {
+			for (int j = 0; j < getCols(); j++) {
+				if (logicMap[i][j]==0) {
+					player.x=i*64;
+					player.y=j*64;
+					player.px=player.x;
+					player.py=player.y;
+				}
+			}
+		}
+		
 	}
 
 	public boolean isUndo() {
