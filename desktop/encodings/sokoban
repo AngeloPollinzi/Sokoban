@@ -1,5 +1,5 @@
-step(0..15).
-maxmosse(15).
+step(0..5).
+maxmosse(5).
 
 %configurazione iniziale.
 target(X,Y):- cell(X,Y,4).
@@ -10,8 +10,8 @@ boxposition(0,Id,X,Y):-box(Id,X,Y).
 move(S,Id,X2,Y2)|not_move(S,Id,X2,Y2):-boxposition(S,Id,X1,Y1),adj(X1,Y1,X2,Y2),step(S),maxmosse(M),S<M.
 
 %non posso spostare piu' di un box nello stesso step.
-:- move(S,Id1,_,_),move(S,Id2,_,_),Id1!=Id2.
-%non posso spostare un box in due direzioni diverse nello stesso istante.
+:-move(S,Id1,_,_),move(S,Id2,_,_),Id1!=Id2.
+%non posso spostare un box in due punti diversi nello stesso istante.
 :- move(S,Id,X,Y1),move(S,Id,X,Y2),Y1!=Y2.
 :- move(S,Id,X1,Y),move(S,Id,X2,Y),X1!=X2.
 :- move(S,Id,X1,Y1),move(S,Id,X2,Y2),X1!=X2,Y1!=Y2.
@@ -19,52 +19,58 @@ move(S,Id,X2,Y2)|not_move(S,Id,X2,Y2):-boxposition(S,Id,X1,Y1),adj(X1,Y1,X2,Y2),
 :- move(S,Id,X,Y),move(S,Id,X,Y+1),move(S+1,Id,X,Y-1).
 :- move(S,Id,X,Y),move(S,Id,X+1,Y),move(S+1,Id,X-1,Y).
 
-%predicato che mi indica se ad un certo step muovo qualcosa
-somethingmoved(S):-move(S,_,_,_),step(S).
+%predicato che mi indica se ad un certo step muovo qualcosa.
+somethingmoved(S):-move(S,_,_,_).
 
-%in base alla direzione scelta cambio la posizione del player,considerando che dove prima c'era il box 
-%ora c'e' il player e che abbia spostato effettivamente qualcosa.
-playerposition(S+1,X,Y):- move(S,Id,X1,Y1),boxposition(S,Id,X,Y).
+%non è possibile avere delle sequenze di spostamenti con step mancanti.
+:-step(S),not maxmosse(S),not somethingmoved(S).
 
 %le posizioni occupate da un box.
 occupied(S,X,Y) :- boxposition(S,_,X,Y).
 
-%caso in cui ad uno step un box non venga mosso.
-boxposition(S+1,Id,X,Y) :- boxposition(S,Id,X,Y), not_move(S,Id,_,_),maxmosse(M),step(S),S<M.
-playerposition(S+1,X,Y) :- playerposition(S,X,Y),not somethingmoved(S),maxmosse(M),step(S),S<M.
+%le box spostate. 
+pushedbox(S,Id):-boxposition(S,Id,X1,Y1),boxposition(S+1,Id,X2,Y2),adj(X1,Y1,X2,Y2).
 
 %tutti i vari spostamenti di un box che posso fare in ogni istante.
-boxposition(S+1,Id,X,Y):- move(S,Id,X,Y).
+boxposition(S+1,Id,X,Y):-move(S,Id,X,Y).
+
+%in base alla direzione scelta cambio la posizione del player,considerando che dove prima c'era il box 
+%ora c'e' il player e che abbia spostato effettivamente qualcosa.
+playerposition(S+1,X,Y):- move(S,Id,_,_),boxposition(S,Id,X,Y).
+
+%caso in cui ad uno step un box non venga mosso.
+boxposition(S+1,Id,X,Y) :- boxposition(S,Id,X,Y), not pushedbox(S,Id),maxmosse(M),step(S),S<M.
+playerposition(S+1,X,Y) :- playerposition(S,X,Y),not somethingmoved(S),maxmosse(M),step(S),S<M.
 
 %al termine non puo' esistere un box che non sia su un target. 
-reached(Id) :- step(M),maxmosse(M),boxposition(M,Id,X,Y),target(X,Y).
-:-boxposition(S,Id,X,Y),not reached(Id).
+reached(Id) :- maxmosse(M),boxposition(M,Id,X,Y),target(X,Y).
+:-move(_,Id,_,_),boxposition(_,Id,_,_),not reached(Id).
 
 %identifica la raggiungibilita' di un punto da parte del player ad ogni step.
-reachable(S,X2,Y2) :- playerposition(S,X,Y),adj(X,Y,X2,Y2),not occupied(S,X2,Y2),step(S).
-reachable(S,X2,Y2) :- reachable(S,X1,Y1),adj(X1,Y1,X2,Y2),not occupied(S,X2,Y2),step(S).
+reachable(S,X,Y) :- playerposition(S,X,Y),step(S).
+reachable(S,X2,Y2) :- reachable(S,X1,Y1),adj(X1,Y1,X2,Y2).
 
 %mi trovo tutti i punti diversi da un dead point, ossia quei punti che hanno una posizione valida a destra e sinistra 
-%oppure sopra o sotto.
+%oppure sopra o sotto ad eccezione dei target.
+notdeadpoint(X,Y) :- target(X,Y).
 notdeadpoint(X,Y) :- adj(X,Y,X+1,Y),adj(X,Y,X-1,Y).
 notdeadpoint(X,Y) :- adj(X,Y,X,Y+1),adj(X,Y,X,Y-1).
 
-%non posso spostare un box in un punto morto che non sia un target
-:-boxposition(S,Id,X,Y),move(S,Id,X,Y+1),not notdeadpoint(X,Y+1),not target(X,Y+1).
-:-boxposition(S,Id,X,Y),move(S,Id,X,Y-1),not notdeadpoint(X,Y-1),not target(X,Y-1).
-:-boxposition(S,Id,X,Y),move(S,Id,X+1,Y),not notdeadpoint(X+1,Y),not target(X+1,Y).
-:-boxposition(S,Id,X,Y),move(S,Id,X-1,Y),not notdeadpoint(X-1,Y),not target(X-1,Y).
+%non posso spostare un box in una cella non occupata da un altro box che sia un punto morto.
+:-move(S,Id,X,Y),not notdeadpoint(X,Y).
 
-%non posso spostare un box in una certa direzione se la casella dalla quale spingerlo
-%non è raggiungibile e non è occupata
-:-boxposition(S,Id,X,Y),move(S,Id,X,Y+1),not reachable(S,X,Y-1),not occupied(S,X,Y-1).
-:-boxposition(S,Id,X,Y),move(S,Id,X,Y-1),not reachable(S,X,Y+1),not occupied(S,X,Y+1).
-:-boxposition(S,Id,X,Y),move(S,Id,X+1,Y),not reachable(S,X-1,Y),not occupied(S,X-1,Y).
-:-boxposition(S,Id,X,Y),move(S,Id,X-1,Y),not reachable(S,X+1,Y),not occupied(S,X+1,Y).
+%non posso spostare un box dove ce n'e' gia' un altro.
+:-move(S,Id,X,Y),occupied(S,X,Y).
 
-%non posso spostare un box dove ce n'e' gia' un altro
-:-boxposition(S,Id,X,Y),move(S,Id,X,Y+1),occupied(S,X,Y+1).
-:-boxposition(S,Id,X,Y),move(S,Id,X,Y-1),occupied(S,X,Y-1).
-:-boxposition(S,Id,X,Y),move(S,Id,X+1,Y),occupied(S,X+1,Y).
-:-boxposition(S,Id,X,Y),move(S,Id,X-1,Y),occupied(S,X-1,Y).
+%non posso spostare un box in una certa direzione se il player non riesce a raggiungere 
+%la casella dalla quale spingerlo.
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y+1),not reachable(S,X,Y-1),not occupied(S,X,Y-1).
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y-1),not reachable(S,X,Y+1),not occupied(S,X,Y+1).
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X+1,Y),not reachable(S,X-1,Y),not occupied(S,X-1,Y).
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X-1,Y),not reachable(S,X+1,Y),not occupied(S,X+1,Y).
 
+%non è possibile che una cella sia 
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y+1),reachable(S,X,Y-1),occupied(S,X,Y-1).
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y-1),reachable(S,X,Y+1),occupied(S,X,Y+1).
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X+1,Y),reachable(S,X-1,Y),occupied(S,X-1,Y).
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X-1,Y),reachable(S,X+1,Y),occupied(S,X+1,Y).

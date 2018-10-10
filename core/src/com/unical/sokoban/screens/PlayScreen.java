@@ -144,19 +144,19 @@ public class PlayScreen implements Screen {
 		else if (sokoban.player.action == Action.RUNNING && sokoban.player.direction == Direction.LEFT)
 			sokoban.batch.draw(sokoban.player.playerLeft, sokoban.player.x + 10, sokoban.player.y, 42, 59);
 
-		if (solver) {
-			MoveBox movement= nextMove(step);
-			Box box=boxToMove(step);
-			
-			sokoban.batch.draw(q, movement.getX()*64, movement.getY()*64, 64, 64);
-			destinationX = movement.getX()*64;
-			destinationY = movement.getY()*64;
-
-			if (destinationX == box.getX() && destinationY == box.getY()) {
-				step++;
-			}
-
-		}
+//		if (solver) {
+//			MoveBox movement= nextMove(step);
+//			Box box=boxToMove(step);
+//			
+//			sokoban.batch.draw(q, movement.getX()*64, movement.getY()*64, 64, 64);
+//			destinationX = movement.getX()*64;
+//			destinationY = movement.getY()*64;
+//
+//			if (destinationX == box.getX() && destinationY == box.getY()) {
+//				step++;
+//			}
+//
+//		}
 		sokoban.batch.end();
 	}
 
