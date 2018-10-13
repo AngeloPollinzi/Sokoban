@@ -1,5 +1,5 @@
-step(0..5).
-maxmosse(5).
+step(0..28).
+maxmosse(28).
 
 %configurazione iniziale.
 target(X,Y):- cell(X,Y,4).
@@ -16,13 +16,15 @@ move(S,Id,X2,Y2)|not_move(S,Id,X2,Y2):-boxposition(S,Id,X1,Y1),adj(X1,Y1,X2,Y2),
 :- move(S,Id,X1,Y),move(S,Id,X2,Y),X1!=X2.
 :- move(S,Id,X1,Y1),move(S,Id,X2,Y2),X1!=X2,Y1!=Y2.
 %evito un doppio spostamento poco sensato(ottimizzazione). 
-:- move(S,Id,X,Y),move(S,Id,X,Y+1),move(S+1,Id,X,Y-1).
-:- move(S,Id,X,Y),move(S,Id,X+1,Y),move(S+1,Id,X-1,Y).
+:- boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y+1),boxposition(S+2,Id,X,Y-1).
+:- boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y-1),boxposition(S+2,Id,X,Y+1).
+:- boxposition(S,Id,X,Y),boxposition(S+1,Id,X+1,Y),boxposition(S+2,Id,X-1,Y).
+:- boxposition(S,Id,X,Y),boxposition(S+1,Id,X-1,Y),boxposition(S+2,Id,X+1,Y).
 
 %predicato che mi indica se ad un certo step muovo qualcosa.
 somethingmoved(S):-move(S,_,_,_).
 
-%non è possibile avere delle sequenze di spostamenti con step mancanti.
+%non e' possibile che ad un certo step non muovo qualcosa.
 :-step(S),not maxmosse(S),not somethingmoved(S).
 
 %le posizioni occupate da un box.
@@ -44,11 +46,11 @@ playerposition(S+1,X,Y) :- playerposition(S,X,Y),not somethingmoved(S),maxmosse(
 
 %al termine non puo' esistere un box che non sia su un target. 
 reached(Id) :- maxmosse(M),boxposition(M,Id,X,Y),target(X,Y).
-:-move(_,Id,_,_),boxposition(_,Id,_,_),not reached(Id).
+:-boxposition(_,Id,_,_),not reached(Id).
 
 %identifica la raggiungibilita' di un punto da parte del player ad ogni step.
 reachable(S,X,Y) :- playerposition(S,X,Y),step(S).
-reachable(S,X2,Y2) :- reachable(S,X1,Y1),adj(X1,Y1,X2,Y2).
+reachable(S,X2,Y2) :- reachable(S,X1,Y1),adj(X1,Y1,X2,Y2),not occupied(S,X2,Y2).
 
 %mi trovo tutti i punti diversi da un dead point, ossia quei punti che hanno una posizione valida a destra e sinistra 
 %oppure sopra o sotto ad eccezione dei target.
@@ -64,13 +66,10 @@ notdeadpoint(X,Y) :- adj(X,Y,X,Y+1),adj(X,Y,X,Y-1).
 
 %non posso spostare un box in una certa direzione se il player non riesce a raggiungere 
 %la casella dalla quale spingerlo.
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y+1),not reachable(S,X,Y-1),not occupied(S,X,Y-1).
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y-1),not reachable(S,X,Y+1),not occupied(S,X,Y+1).
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X+1,Y),not reachable(S,X-1,Y),not occupied(S,X-1,Y).
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X-1,Y),not reachable(S,X+1,Y),not occupied(S,X+1,Y).
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y+1),not reachable(S,X,Y-1).
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y-1),not reachable(S,X,Y+1).
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X+1,Y),not reachable(S,X-1,Y).
+:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X-1,Y),not reachable(S,X+1,Y).
 
-%non è possibile che una cella sia 
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y+1),reachable(S,X,Y-1),occupied(S,X,Y-1).
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y-1),reachable(S,X,Y+1),occupied(S,X,Y+1).
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X+1,Y),reachable(S,X-1,Y),occupied(S,X-1,Y).
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X-1,Y),reachable(S,X+1,Y),occupied(S,X+1,Y).
+%e' preferibile spostare per piu' step successivi sempre lo stesso box.
+:~move(S,Id1,_,_),move(S+1,Id2,_,_),Id1!=Id2. [1@1]

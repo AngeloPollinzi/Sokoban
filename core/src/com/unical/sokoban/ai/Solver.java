@@ -37,7 +37,7 @@ public class Solver {
 	public void solve() throws Exception {
 
 		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2"));
-		handler.addOption(new OptionDescriptor("-n=0 "));
+//		handler.addOption(new OptionDescriptor("-n=0 "));
 		InputProgram facts = new ASPInputProgram();
 
 		try {
@@ -66,28 +66,23 @@ public class Solver {
 		Adj adj = null;
 		Cell c = null;
 		for (int i = 0; i < world.getRows(); i++) {
-
 			for (int j = 0; j < world.getCols(); j++) {
 				if (sokobanMatrix[i][j] != 2) {
 					if (j + 1 < world.getCols() && sokobanMatrix[i][j + 1] != 2) {
 						adj = new Adj(i, j, i, j + 1);
 						facts.addObjectInput(adj);
-						System.out.println(adj);
 					}
 					if (j - 1 >= 0 && sokobanMatrix[i][j - 1] != 2) {
 						adj = new Adj(i, j, i, j - 1);
 						facts.addObjectInput(adj);
-						System.out.println(adj);
 					}
 					if (i + 1 < world.getRows() && sokobanMatrix[i + 1][j] != 2) {
 						adj = new Adj(i, j, i + 1, j);
 						facts.addObjectInput(adj);
-						System.out.println(adj);
 					}
 					if (i - 1 >= 0 && sokobanMatrix[i - 1][j] != 2) {
 						adj = new Adj(i, j, i - 1, j);
 						facts.addObjectInput(adj);
-						System.out.println(adj);
 
 					}
 					if (sokobanMatrix[i][j] == 1 || sokobanMatrix[i][j] == 4) {
@@ -99,30 +94,29 @@ public class Solver {
 
 		}
 
-//		handler.addProgram(facts);
-//		InputProgram encoding = new ASPInputProgram();
-//		encoding.addProgram(getEncodings(encodingResource));
-//		handler.addProgram(encoding);
-//
-//		Output o = handler.startSync();
-//
-//		DLV2AnswerSets answers = (DLV2AnswerSets) o;
-//
-//		if (answers.getAnswersets().size() <= 0) {
-//			System.out.println("NO ANSWER SETS");
-//		} else
-//			for (AnswerSet a : answers.getAnswersets()) {
-//				try {
-//					for (Object obj : a.getAtoms()) {
-//						if (obj instanceof MoveBox) {
-//							MoveBox movement = (MoveBox) obj;
-//							movements.add(movement);
-//						}
-//					}
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
+		handler.addProgram(facts);
+		InputProgram encoding = new ASPInputProgram();
+		encoding.addProgram(getEncodings(encodingResource));
+		handler.addProgram(encoding);
+
+		Output o = handler.startSync();
+		DLV2AnswerSets answers = (DLV2AnswerSets) o;
+
+		if (answers.getAnswersets().size() <= 0) {
+			System.out.println("NO ANSWER SETS");
+		} else
+			for (AnswerSet a : answers.getAnswersets()) {
+				try {
+					for (Object obj : a.getAtoms()) {
+						if (obj instanceof MoveBox) {
+							MoveBox movement = (MoveBox) obj;
+							movements.add(movement);
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 	}
 
 	private static String getEncodings(String encodingResource) {
