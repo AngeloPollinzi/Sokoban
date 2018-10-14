@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.unical.sokoban.Sokoban;
 import com.unical.sokoban.logic.World;
 import it.unical.mat.embasp.base.Handler;
 import it.unical.mat.embasp.base.InputProgram;
@@ -37,7 +38,6 @@ public class Solver {
 	public void solve() throws Exception {
 
 		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2"));
-//		handler.addOption(new OptionDescriptor("-n=0 "));
 		InputProgram facts = new ASPInputProgram();
 
 		try {
@@ -49,7 +49,7 @@ public class Solver {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
+		
 		BoxEmbasp b=null;
 		for (int i = 0; i < world.boxes.size(); i++) {
 			try {
@@ -92,6 +92,26 @@ public class Solver {
 				}
 			}
 
+		}
+		
+		switch (world.boxes.size()) {
+		case 1:
+			facts.addObjectInput(new MaxMosse(5));
+			break;
+		case 2:
+			facts.addObjectInput(new MaxMosse(28));
+			break;
+		case 3:
+			facts.addObjectInput(new MaxMosse(20));
+			break;
+		case 4:
+			facts.addObjectInput(new MaxMosse(29));
+			break;
+		case 5:
+			facts.addObjectInput(new MaxMosse(48));
+			break;
+		default:
+			break;
 		}
 
 		handler.addProgram(facts);

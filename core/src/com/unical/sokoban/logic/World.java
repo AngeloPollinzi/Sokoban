@@ -244,6 +244,8 @@ public class World {
 					player.y=j*64;
 					player.px=player.x;
 					player.py=player.y;
+					player.action = Action.STANDING;
+					player.direction = Direction.DOWN;
 				}
 			}
 		}

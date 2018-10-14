@@ -23,12 +23,12 @@ public class PlayScreen implements Screen {
 	private Viewport viewport;
 	private Hud hud;
 	private float elapsedTime;
-	private ArrayList<MoveBox> movements;
-	private int step = 0;
 	private Texture up;
 	private Texture down;
 	private Texture right;
 	private Texture left;
+	private ArrayList<MoveBox> movements;
+	private int step = 0;
 	private boolean solver = false;
 	float destinationX = 0, destinationY = 0;
 
@@ -61,6 +61,8 @@ public class PlayScreen implements Screen {
 			movements.clear();
 			destinationX = 0;
 			destinationY = 0;
+			step=0;
+			
 			elapsedTime += delta;
 			if (elapsedTime >= 2f) {
 				elapsedTime = 0f;
@@ -121,7 +123,7 @@ public class PlayScreen implements Screen {
 		hud.getStage().draw();
 
 		sokoban.batch.begin();
-
+		
 		if (solver) {
 			MoveBox movement = nextMove(step);
 			Box box = boxToMove(step);

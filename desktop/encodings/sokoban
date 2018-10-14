@@ -1,7 +1,7 @@
-step(0..28).
-maxmosse(28).
 
 %configurazione iniziale.
+step(0).
+step(S+1):-step(S),maxmosse(M),S+1<=M.
 target(X,Y):- cell(X,Y,4).
 playerposition(0,X,Y):-cell(X,Y,1).
 boxposition(0,Id,X,Y):-box(Id,X,Y).
@@ -15,11 +15,6 @@ move(S,Id,X2,Y2)|not_move(S,Id,X2,Y2):-boxposition(S,Id,X1,Y1),adj(X1,Y1,X2,Y2),
 :- move(S,Id,X,Y1),move(S,Id,X,Y2),Y1!=Y2.
 :- move(S,Id,X1,Y),move(S,Id,X2,Y),X1!=X2.
 :- move(S,Id,X1,Y1),move(S,Id,X2,Y2),X1!=X2,Y1!=Y2.
-%evito un doppio spostamento poco sensato(ottimizzazione). 
-:- boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y+1),boxposition(S+2,Id,X,Y-1).
-:- boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y-1),boxposition(S+2,Id,X,Y+1).
-:- boxposition(S,Id,X,Y),boxposition(S+1,Id,X+1,Y),boxposition(S+2,Id,X-1,Y).
-:- boxposition(S,Id,X,Y),boxposition(S+1,Id,X-1,Y),boxposition(S+2,Id,X+1,Y).
 
 %predicato che mi indica se ad un certo step muovo qualcosa.
 somethingmoved(S):-move(S,_,_,_).
@@ -71,5 +66,8 @@ notdeadpoint(X,Y) :- adj(X,Y,X,Y+1),adj(X,Y,X,Y-1).
 :-boxposition(S,Id,X,Y),boxposition(S+1,Id,X+1,Y),not reachable(S,X-1,Y).
 :-boxposition(S,Id,X,Y),boxposition(S+1,Id,X-1,Y),not reachable(S,X+1,Y).
 
-%e' preferibile spostare per piu' step successivi sempre lo stesso box.
-:~move(S,Id1,_,_),move(S+1,Id2,_,_),Id1!=Id2. [1@1]
+%evito un doppio spostamento poco sensato(ottimizzazione). 
+:-boxposition(S,Id,X1,Y1),move(S,Id,X2,Y2),move(S+1,Id,X1,Y1).
+
+%e' preferibile avere meno mosse del player
+:~playerposition(_,_,_). [1@1]

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.3" orientation="orthogonal" renderorder="right-down" width="14" height="12" tilewidth="64" tileheight="64" infinite="0" nextobjectid="66">
+<map version="1.0" tiledversion="1.1.3" orientation="orthogonal" renderorder="right-down" width="14" height="12" tilewidth="64" tileheight="64" infinite="0" nextobjectid="93">
  <tileset firstgid="1" name="sprites" tilewidth="64" tileheight="64" tilecount="36" columns="6">
   <image source="sprites.png" width="421" height="421"/>
  </tileset>
@@ -13,7 +13,7 @@
  </layer>
  <layer name="graphics" width="14" height="12">
   <data encoding="base64" compression="zlib">
-   eJwTZmBgECYTowNy9aGbgctcBjSaGLNwmYdLDbHuJGQfOo0uhssNhNxLyJ3EmEup/7DZjc89lGAAM6AGKg==
+   eJwTZmBgECYTowNy9aGbgctMBiw0PnPwuRNdHTH6cLmRVHeiq8Omj1T7sKklN14HEwYAT38H3w==
   </data>
  </layer>
  <objectgroup name="walls">
@@ -23,7 +23,6 @@
   <object id="6" x="64" y="704" width="768" height="64"/>
   <object id="8" x="128" y="192" width="64" height="64"/>
   <object id="9" x="256" y="192" width="64" height="64"/>
-  <object id="10" x="320" y="192" width="64" height="64"/>
   <object id="11" x="320" y="64" width="64" height="64"/>
   <object id="12" x="576" y="64" width="64" height="64"/>
   <object id="13" x="512" y="128" width="64" height="64"/>
@@ -40,7 +39,6 @@
   <object id="29" x="448" y="512" width="64" height="64"/>
   <object id="30" x="512" y="512" width="64" height="64"/>
   <object id="31" x="448" y="448" width="64" height="64"/>
-  <object id="32" x="448" y="384" width="64" height="64"/>
   <object id="33" x="256" y="384" width="64" height="64"/>
   <object id="34" x="128" y="384" width="64" height="64"/>
   <object id="35" x="128" y="448" width="64" height="64"/>
@@ -56,19 +54,44 @@
   <object id="63" x="640" y="64" width="64" height="64"/>
   <object id="64" x="768" y="64" width="64" height="64"/>
   <object id="65" x="704" y="64" width="64" height="64"/>
+  <object id="67" x="576" y="640" width="64" height="64"/>
+  <object id="68" x="640" y="640" width="64" height="64"/>
+  <object id="69" x="704" y="640" width="64" height="64"/>
+  <object id="70" x="256" y="640" width="64" height="64"/>
+  <object id="71" x="320" y="640" width="64" height="64"/>
+  <object id="72" x="768" y="512" width="64" height="64"/>
+  <object id="73" x="704" y="512" width="64" height="64"/>
+  <object id="74" x="768" y="384" width="64" height="64"/>
+  <object id="75" x="768" y="320" width="64" height="64"/>
+  <object id="76" x="768" y="192" width="64" height="64"/>
+  <object id="77" x="768" y="128" width="64" height="64"/>
+  <object id="78" x="576" y="512" width="64" height="64"/>
+  <object id="79" x="448" y="320" width="64" height="64"/>
+  <object id="80" x="256" y="576" width="64" height="64"/>
+  <object id="81" x="192" y="576" width="64" height="64"/>
+  <object id="82" x="128" y="576" width="64" height="64"/>
+  <object id="83" x="384" y="576" width="64" height="64"/>
+  <object id="84" x="64" y="576" width="64" height="64"/>
+  <object id="85" x="320" y="576" width="64" height="64"/>
+  <object id="87" x="448" y="576" width="64" height="64"/>
+  <object id="88" x="512" y="576" width="64" height="64"/>
+  <object id="89" x="576" y="576" width="64" height="64"/>
+  <object id="90" x="640" y="576" width="64" height="64"/>
+  <object id="91" x="704" y="576" width="64" height="64"/>
+  <object id="92" x="768" y="576" width="64" height="64"/>
  </objectgroup>
  <objectgroup name="blocks">
   <object id="38" x="128" y="256" width="64" height="64"/>
-  <object id="39" x="192" y="512" width="64" height="64"/>
-  <object id="40" x="192" y="128" width="64" height="64"/>
-  <object id="42" x="320" y="512" width="64" height="64"/>
-  <object id="43" x="256" y="320" width="64" height="64"/>
+  <object id="39" x="192" y="384" width="64" height="64"/>
+  <object id="40" x="192" y="256" width="64" height="64"/>
+  <object id="42" x="256" y="448" width="64" height="64"/>
+  <object id="43" x="192" y="320" width="64" height="64"/>
  </objectgroup>
  <objectgroup name="targets">
-  <object id="46" x="640" y="160" width="32" height="32"/>
-  <object id="48" x="576" y="160" width="32" height="32"/>
-  <object id="49" x="768" y="224" width="32" height="32"/>
-  <object id="50" x="768" y="160" width="32" height="32"/>
-  <object id="51" x="704" y="160" width="32" height="32"/>
+  <object id="46" x="576" y="224" width="32" height="32"/>
+  <object id="48" x="512" y="224" width="32" height="32"/>
+  <object id="49" x="704" y="288" width="32" height="32"/>
+  <object id="50" x="512" y="352" width="32" height="32"/>
+  <object id="51" x="640" y="288" width="32" height="32"/>
  </objectgroup>
 </map>

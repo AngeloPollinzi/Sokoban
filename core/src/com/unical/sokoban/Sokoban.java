@@ -85,5 +85,5 @@ public class Sokoban extends Game {
 	public Solver getSolver() {
 		return solver;
 	}
-
+	
 }
