@@ -3,8 +3,9 @@ package com.unical.sokoban.ai;
 import it.unical.mat.embasp.languages.Id;
 import it.unical.mat.embasp.languages.Param;
 
-@Id("adj")
-public class Adj {
+/*location (x2,y2) is on top of (x1,y1)*/
+@Id("top")
+public class Top {
 	
 	@Param(0)
 	private int x1;
@@ -14,18 +15,18 @@ public class Adj {
 	private int x2;
 	@Param(3)
 	private int y2;
-
-	public Adj() {
-	}
 	
-	public Adj(int x1, int y1, int x2, int y2) {
+	public Top(int x1, int y1, int x2, int y2) {
 		this.x1 = x1;
 		this.y1 = y1;
 		this.x2 = x2;
 		this.y2 = y2;
 	}
-
 	
+	public Top() {
+		
+	}
+
 	public int getX1() {
 		return x1;
 	}
@@ -57,13 +58,10 @@ public class Adj {
 	public void setY2(int y2) {
 		this.y2 = y2;
 	}
-
+	
 	@Override
 	public String toString() {
-		String print;
-		print = "adj(" + this.x1+ "," + this.y1+ "," + this.x2 +","+this.y2 + ").";
-		return print;
+		return "top("+this.x1+","+this.y1+","+this.x2+","+this.y2+").";
 	}
-
-
+	
 }

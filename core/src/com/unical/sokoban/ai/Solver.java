@@ -49,13 +49,13 @@ public class Solver {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		BoxEmbasp b=null;
+
+		BoxEmbasp b = null;
 		for (int i = 0; i < world.boxes.size(); i++) {
 			try {
 				int x = (int) (world.boxes.get(i).getX() / 64);
 				int y = (int) (world.boxes.get(i).getY() / 64);
-				b=new BoxEmbasp(i, x, y);
+				b = new BoxEmbasp(i, x, y);
 				facts.addObjectInput(b);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -63,27 +63,19 @@ public class Solver {
 			}
 		}
 
-		Adj adj = null;
+		Right r = null;
+		Top t = null;
 		Cell c = null;
 		for (int i = 0; i < world.getRows(); i++) {
 			for (int j = 0; j < world.getCols(); j++) {
 				if (sokobanMatrix[i][j] != 2) {
 					if (j + 1 < world.getCols() && sokobanMatrix[i][j + 1] != 2) {
-						adj = new Adj(i, j, i, j + 1);
-						facts.addObjectInput(adj);
-					}
-					if (j - 1 >= 0 && sokobanMatrix[i][j - 1] != 2) {
-						adj = new Adj(i, j, i, j - 1);
-						facts.addObjectInput(adj);
+						t = new Top(i, j, i, j + 1);
+						facts.addObjectInput(t);
 					}
 					if (i + 1 < world.getRows() && sokobanMatrix[i + 1][j] != 2) {
-						adj = new Adj(i, j, i + 1, j);
-						facts.addObjectInput(adj);
-					}
-					if (i - 1 >= 0 && sokobanMatrix[i - 1][j] != 2) {
-						adj = new Adj(i, j, i - 1, j);
-						facts.addObjectInput(adj);
-
+						r = new Right(i, j, i + 1, j);
+						facts.addObjectInput(r);
 					}
 					if (sokobanMatrix[i][j] == 1 || sokobanMatrix[i][j] == 4) {
 						c = new Cell(i, j, sokobanMatrix[i][j]);
@@ -93,22 +85,22 @@ public class Solver {
 			}
 
 		}
-		
+
 		switch (world.boxes.size()) {
 		case 1:
-			facts.addObjectInput(new MaxMosse(5));
+			facts.addObjectInput(new MaxMosse(2));
 			break;
 		case 2:
-			facts.addObjectInput(new MaxMosse(28));
+			facts.addObjectInput(new MaxMosse(12));
 			break;
 		case 3:
-			facts.addObjectInput(new MaxMosse(20));
+			facts.addObjectInput(new MaxMosse(10));
 			break;
 		case 4:
-			facts.addObjectInput(new MaxMosse(29));
+			facts.addObjectInput(new MaxMosse(12));
 			break;
 		case 5:
-			facts.addObjectInput(new MaxMosse(48));
+			facts.addObjectInput(new MaxMosse(22));
 			break;
 		default:
 			break;

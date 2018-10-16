@@ -1,73 +1,86 @@
-
-%configurazione iniziale.
 step(0).
-step(S+1):-step(S),maxmosse(M),S+1<=M.
-target(X,Y):- cell(X,Y,4).
-playerposition(0,X,Y):-cell(X,Y,1).
-boxposition(0,Id,X,Y):-box(Id,X,Y).
+step(S+1):-step(S),maxmosse(M),S<M.
+next(S,S1):-step(S),step(S1),S1=S+1.
+actionstep(S) :- next(S,S1).
+notfinalstep(S) :- next(S,S1).
+finalstep(S) :- step(S), not notfinalstep(S).
+initialstep(S) :- step(S), not notinitialstep(S).
+notinitialstep(S) :- next(S1,S).
 
-%decido se spostare un box o meno in una certa casella se ci sono ancora mosse disponibili.
-move(S,Id,X2,Y2)|not_move(S,Id,X2,Y2):-boxposition(S,Id,X1,Y1),adj(X1,Y1,X2,Y2),step(S),maxmosse(M),S<M.
+left(X1,Y1,X2,Y2) :- right(X2,Y2,X1,Y1).
+bottom(X1,Y1,X2,Y2) :- top(X2,Y2,X1,Y1).
 
-%non posso spostare piu' di un box nello stesso step.
-:-move(S,Id1,_,_),move(S,Id2,_,_),Id1!=Id2.
-%non posso spostare un box in due punti diversi nello stesso istante.
-:- move(S,Id,X,Y1),move(S,Id,X,Y2),Y1!=Y2.
-:- move(S,Id,X1,Y),move(S,Id,X2,Y),X1!=X2.
-:- move(S,Id,X1,Y1),move(S,Id,X2,Y2),X1!=X2,Y1!=Y2.
+adj(X1,Y1,X2,Y2) :- right(X1,Y1,X2,Y2).
+adj(X1,Y1,X2,Y2) :- left(X1,Y1,X2,Y2).
+adj(X1,Y1,X2,Y2) :- top(X1,Y1,X2,Y2).
+adj(X1,Y1,X2,Y2) :- bottom(X1,Y1,X2,Y2).
 
-%predicato che mi indica se ad un certo step muovo qualcosa.
-somethingmoved(S):-move(S,_,_,_).
+target(X,Y):-cell(X,Y,4).
 
-%non e' possibile che ad un certo step non muovo qualcosa.
-:-step(S),not maxmosse(S),not somethingmoved(S).
+%Posizioni iniziali...
+boxposition(S,X,Y) :- box(_,X,Y), initialstep(S).
+playerposition(S,X,Y) :- cell(X,Y,1), initialstep(S).
 
-%le posizioni occupate da un box.
-occupied(S,X,Y) :- boxposition(S,_,X,Y).
+%allo step S muovo un box in posizione (X1,Y1) in una certa direzione fino alla posizione (X2,Y2)...
+move(S,right,X1,Y1,X2,Y2) | notmove(S,right,X1,Y1,X2,Y2) :- reachable(S,X,Y), right(X,Y,X1,Y1), boxposition(S,X1,Y1), canmoveright(S,X1,Y1,X2,Y2), notdeadpoint(X2,Y2), actionstep(S).
+move(S,up,X1,Y1,X2,Y2) | notmove(S,up,X1,Y1,X2,Y2) :- reachable(S,X,Y), top(X,Y,X1,Y1),boxposition(S,X1,Y1), canmovetop(S,X1,Y1,X2,Y2), notdeadpoint(X2,Y2), actionstep(S).
+move(S,down,X1,Y1,X2,Y2) | notmove(S,down,X1,Y1,X2,Y2) :- reachable(S,X,Y), bottom(X,Y,X1,Y1), boxposition(S,X1,Y1), canmovebottom(S,X1,Y1,X2,Y2), notdeadpoint(X2,Y2), actionstep(S).
+move(S,left,X1,Y1,X2,Y2) | notmove(S,left,X1,Y1,X2,Y2) :- reachable(S,X,Y), left(X,Y,X1,Y1), boxposition(S,X1,Y1), canmoveleft(S,X1,Y1,X2,Y2), notdeadpoint(X2,Y2), actionstep(S).
 
-%le box spostate. 
-pushedbox(S,Id):-boxposition(S,Id,X1,Y1),boxposition(S+1,Id,X2,Y2),adj(X1,Y1,X2,Y2).
+%non posso spingere due box differenti allo stesso step
+:- move(S,_,X,Y1,_,_),move(S,_,X,Y2,_,_), Y1!=Y2.
+:- move(S,_,X1,Y,_,_),move(S,_,X2,Y,_,_), X1!=X2.
+:- move(S,_,X1,Y1,_,_),move(S,_,X2,Y2,_,_), X1!=X2,Y1!=Y2.
+%non posso spostare un box in due direzioni deifferenti allo stesso step.
+:- move(S,D1,X,Y,_,_), move(S,D2,X,Y,_,_), D1!=D2.
+%non posso spostare un box in destinazioni differenti allo stesso step
+:- move(S,D,X,Y,X,Y1), move(S,D,X,Y,X,Y2), Y1!=Y2.
+:- move(S,D,X,Y,X1,Y), move(S,D,X,Y,X2,Y), X1!=X2.
 
-%tutti i vari spostamenti di un box che posso fare in ogni istante.
-boxposition(S+1,Id,X,Y):-move(S,Id,X,Y).
+%predicato che mi indica se allo step S posso spostarmi in una certa direzione di un certo numero di caselle.
+canmoveright(S,X1,Y1,X2,Y2) :- boxposition(S,X1,Y1), right(X1,Y1,X2,Y2), not boxposition(S,X2,Y2), actionstep(S).
+canmoveright(S,X1,Y1,X2,Y2) :- canmoveright(S,X1,Y1,X,Y), right(X,Y,X2,Y2), not boxposition(S,X2,Y2).
+canmoveleft(S,X1,Y1,X2,Y2) :- boxposition(S,X1,Y1), left(X1,Y1,X2,Y2), not boxposition(S,X2,Y2), actionstep(S).
+canmoveleft(S,X1,Y1,X2,Y2) :- canmoveleft(S,X1,Y1,X,Y), left(X,Y,X2,Y2), not boxposition(S,X2,Y2).
+canmovetop(S,X1,Y1,X2,Y2) :- boxposition(S,X1,Y1), top(X1,Y1,X2,Y2), not boxposition(S,X2,Y2), actionstep(S).
+canmovetop(S,X1,Y1,X2,Y2) :- canmovetop(S,X1,Y1,X,Y), top(X,Y,X2,Y2), not boxposition(S,X2,Y2).
+canmovebottom(S,X1,Y1,X2,Y2) :- boxposition(S,X1,Y1), bottom(X1,Y1,X2,Y2), not boxposition(S,X2,Y2), actionstep(S).
+canmovebottom(S,X1,Y1,X2,Y2) :- canmovebottom(S,X1,Y1,X,Y), bottom(X,Y,X2,Y2), not boxposition(S,X2,Y2).
 
-%in base alla direzione scelta cambio la posizione del player,considerando che dove prima c'era il box 
-%ora c'e' il player e che abbia spostato effettivamente qualcosa.
-playerposition(S+1,X,Y):- move(S,Id,_,_),boxposition(S,Id,X,Y).
+%tutte le posizioni raggiungibili dal player allo step S
+reachable(S,X,Y) :- playerposition(S,X,Y).
+reachable(S,X,Y) :- reachable(S,X1,Y1), adj(X1,Y1,X,Y), not boxposition(S,X,Y).
 
-%caso in cui ad uno step un box non venga mosso.
-boxposition(S+1,Id,X,Y) :- boxposition(S,Id,X,Y), not pushedbox(S,Id),maxmosse(M),step(S),S<M.
-playerposition(S+1,X,Y) :- playerposition(S,X,Y),not somethingmoved(S),maxmosse(M),step(S),S<M.
+%se sposto un box il player allo step successivo si trovera' nella casella adiacente al box in termini di spostamento.
+playerposition(S1,X1,Y1) :- move(S,right,_,_,X2,Y2), next(S,S1), right(X1,Y1,X2,Y2).
+playerposition(S1,X1,Y1) :- move(S,left,_,_,X2,Y2), next(S,S1), left(X1,Y1,X2,Y2).
+playerposition(S1,X1,Y1) :-move(S,up,_,_,X2,Y2), next(S,S1), top(X1,Y1,X2,Y2).
+playerposition(S1,X1,Y1) :- move(S,down,_,_,X2,Y2), next(S,S1), bottom(X1,Y1,X2,Y2).
+notplayerposition(S1,X,Y) :- move(S,_,X1,Y1,X2,Y2), next(S,S1), playerposition(S,X,Y),X1=X2,Y1!=Y2.
+notplayerposition(S1,X,Y) :- move(S,_,X1,Y1,X2,Y2), next(S,S1), playerposition(S,X,Y),X1!=X2,Y1=Y2.
 
-%al termine non puo' esistere un box che non sia su un target. 
-reached(Id) :- maxmosse(M),boxposition(M,Id,X,Y),target(X,Y).
-:-boxposition(_,Id,_,_),not reached(Id).
+%spostamenti del box causati dal un movimento.
+boxposition(S1,X,Y) :- move(S,_,_,_,X,Y), next(S,S1).
+notboxposition(S1,X1,Y1) :- move(S,_,X1,Y1,X2,Y2), next(S,S1),X1=X2,Y1!=Y2.
+notboxposition(S1,X1,Y1) :- move(S,_,X1,Y1,X2,Y2), next(S,S1), X1!=X2,Y1=Y2.
 
-%identifica la raggiungibilita' di un punto da parte del player ad ogni step.
-reachable(S,X,Y) :- playerposition(S,X,Y),step(S).
-reachable(S,X2,Y2) :- reachable(S,X1,Y1),adj(X1,Y1,X2,Y2),not occupied(S,X2,Y2).
+%posso spostare un box alla volta,dunque quando sposto un box tutti gli altri saranno fermi.
+boxposition(S1,X,Y) :- boxposition(S,X,Y), next(S,S1), not notboxposition(S1,X,Y).
+playerposition(S,X,Y) :- playerposition(S,X,Y), next(S,S1), not notplayerposition(S1,X,Y).
 
-%mi trovo tutti i punti diversi da un dead point, ossia quei punti che hanno una posizione valida a destra e sinistra 
-%oppure sopra o sotto ad eccezione dei target.
+%predicato che contiene tutti i punti dai quali posso tirar fuori il mio box senza che resti bloccato.
+%sono sia i target,sia i punti che hanno una cella valida a destra e a sinistra oppure sopra e sotto
+notdeadpoint(X,Y) :- right(X,Y,_,_), left(X,Y,_,_).
+notdeadpoint(X,Y) :- top(X,Y,_,_), bottom(X,Y,_,_).
 notdeadpoint(X,Y) :- target(X,Y).
-notdeadpoint(X,Y) :- adj(X,Y,X+1,Y),adj(X,Y,X-1,Y).
-notdeadpoint(X,Y) :- adj(X,Y,X,Y+1),adj(X,Y,X,Y-1).
 
-%non posso spostare un box in una cella non occupata da un altro box che sia un punto morto.
-:-move(S,Id,X,Y),not notdeadpoint(X,Y).
+%non posso avere sequenze di spostamenti in cui viene saltato uno step.
+somethingmoved(S) :- move(S,_,_,_,_,_).
+missingmovement(S):- actionstep(S), not somethingmoved(S).
+:- missingmovement(S).
 
-%non posso spostare un box dove ce n'e' gia' un altro.
-:-move(S,Id,X,Y),occupied(S,X,Y).
+notsolutionstep(S) :- target(X,Y), step(S), not boxposition(S,X,Y).
+solutionnotfound(S) :- notsolutionstep(S), finalstep(S).
+:- solutionnotfound(S).
 
-%non posso spostare un box in una certa direzione se il player non riesce a raggiungere 
-%la casella dalla quale spingerlo.
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y+1),not reachable(S,X,Y-1).
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X,Y-1),not reachable(S,X,Y+1).
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X+1,Y),not reachable(S,X-1,Y).
-:-boxposition(S,Id,X,Y),boxposition(S+1,Id,X-1,Y),not reachable(S,X+1,Y).
-
-%evito un doppio spostamento poco sensato(ottimizzazione). 
-:-boxposition(S,Id,X1,Y1),move(S,Id,X2,Y2),move(S+1,Id,X1,Y1).
-
-%e' preferibile avere meno mosse del player
 :~playerposition(_,_,_). [1@1]
